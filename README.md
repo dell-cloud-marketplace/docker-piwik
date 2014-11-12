@@ -28,7 +28,7 @@ Build the Piwik image with the tag `dell/piwik`:
 
 #### A. Basic Usage
 Start your container with:
- - Ports 80 (Apache Web Server) and 3306 (MySQL) exposed.
+ - Ports 80, 443 (Apache Web Server) and 3306 (MySQL) exposed.
  - A named container (**piwik**).
  - A MySQL user **admin** with a random password
  
@@ -38,12 +38,13 @@ Start your container with:
              -e MYSQL_PASS="$(pwgen -s -1 16)" \
              -p 80:80 \
              -p 3306:3306 \
+             -p 443:443 \
              dell/piwik
 ```
 
 #### B. Advanced Usage
 Start your container with:
- - Ports 80 (Apache Web Server) and 3306 (MySQL) exposed.
+ - Ports 80, 443 (Apache Web Server) and 3306 (MySQL) exposed.
  - A named container (**piwik**).
  - A MySQL user **admin**  with a predefined password: "password"
  - Two data volumes (which will survive a restart or recreation of the container). The MySQL data is available in **/data/mysql** on the host. The PHP application files are available in **/app** on the host.
@@ -57,6 +58,7 @@ As follows:
              -e MYSQL_PASS="password"  \
              -p 80:80 \
              -p 3306:3306 \
+             -p 443:443 \
              dell/piwik
 
 
@@ -92,6 +94,13 @@ Next, you can test the admin connection to MySQL:
 Access the container from your browser:
 
     http://<ip address>
+    
+    OR
+ 
+    https://<ip address>
+
+
+**We strongly recommend that you connect via HTTPS**, for this step, and all subsequent administrative tasks, if the container is running outside your local machine (e.g. in the Cloud). Your browser will warn you that the certificate is not trusted. If you are unclear about how to proceed, please consult your browser's documentation on how to accept the certificate.
 
 #### Step 1: Welcome to Piwik's Installation Wizard!
 Click Next to proceed with the installation.

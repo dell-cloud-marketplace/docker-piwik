@@ -2,10 +2,7 @@
 
 VOLUME_HOME="/var/lib/mysql"
 
-sed -i -e 's/^bind-address/#bind-address/' /etc/mysql/my.cnf
-
-sed -ri -e "s/^upload_max_filesize.*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}/" \
-    -e "s/^post_max_size.*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php5/apache2/php.ini
+# Possibly invoke the inherited script.
 if [[ ! -d $VOLUME_HOME/mysql ]]; then
     echo "=> An empty or uninitialized MySQL volume is detected in $VOLUME_HOME"
     echo "=> Installing MySQL ..."
@@ -16,14 +13,16 @@ else
     echo "=> Using an existing volume of MySQL"
 fi
 
-#If the application directory is empty, copy the site.
 APPLICATION_HOME="/var/www/html"
 
+# If the application directory is empty, copy the site.
 if [ ! "$(ls -A $APPLICATION_HOME)" ]; then
     # Copy the application folder.
-    cp -r /app/* $APPLICATION_HOME
-    # Configure permissions.
-    chmod a+w $APPLICATION_HOME/config $APPLICATION_HOME/tmp
+    cp -r /piwik/. $APPLICATION_HOME
+
+    # Configure ownership.
+    chown -R www-data:www-data $APPLICATION_HOME/tmp
+    chown -R www-data:www-data $APPLICATION_HOME/config
 fi
 
 exec supervisord -n

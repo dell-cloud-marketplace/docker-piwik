@@ -1,8 +1,6 @@
 # docker-piwik
 
-This image installs [Piwik][piwik] 2.8.3 an open source web analytics platform. 
-
-[piwik]: https://piwik.org/
+This image installs [Piwik](https://piwik.org), an open-source web analytics platform. 
 
 ## Components
 
@@ -11,139 +9,161 @@ The stack comprises the following components (some are obtained through [docker-
 Name       | Version                   | Description
 -----------|---------------------------|------------------------------
 Piwik      | 2.8.3                     | Web analytics platform
-Ubuntu     | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base)                    | Operating system
-MySQL      | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base)      | Database
-Apache     | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base)      | Web server
-PHP        | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base)      | Scripting language
+Ubuntu     | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base) | Operating system
+MySQL      | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base) | Database
+Apache     | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base) | Web server
+PHP        | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base) | Scripting language
 
 ## Usage
-### 1. Image Creation
 
-Build the Piwik image with the tag `dell/piwik`:
-
-    sudo docker build -t dell/piwik .
-
-
-### 2. Container Creation / Running
+### 1. Start the Container
 
 #### A. Basic Usage
-Start your container with:
- - Ports 80, 443 (Apache Web Server) and 3306 (MySQL) exposed.
- - A named container (**piwik**).
- - A MySQL user **admin** with a random password
- 
-```no-highlight
 
-    sudo docker run -d --name="piwik" \
-             -e MYSQL_PASS="$(pwgen -s -1 16)" \
-             -p 80:80 \
-             -p 3306:3306 \
-             -p 443:443 \
-             dell/piwik
-```
-
-#### B. Advanced Usage
 Start your container with:
- - Ports 80, 443 (Apache Web Server) and 3306 (MySQL) exposed.
- - A named container (**piwik**).
- - A MySQL user **admin**  with a predefined password: "password"
- - Two data volumes (which will survive a restart or recreation of the container). The MySQL data is available in **/data/mysql** on the host. The PHP application files are available in **/app** on the host.
+
+* Ports 80, 443 (Apache Web Server) and 3306 (MySQL) exposed
+* A named container (**piwik**)
 
 As follows: 
 
+```no-highlight
+sudo docker run -d -p 80:80 -p 443:443 -p 3306:3306 --name piwik dell/piwik
+```
 
-    sudo docker run -d --name="piwik" \
-             -v /app:/var/www/html \
-             -v /data/mysql:/var/lib/mysql \
-             -e MYSQL_PASS="password"  \
-             -p 80:80 \
-             -p 3306:3306 \
-             -p 443:443 \
-             dell/piwik
+#### B. Advanced Usage
 
+Start your container with:
 
-### 3. Connecting to the Database
+* Ports 80, 443 (Apache Web Server) and 3306 (MySQL) exposed
+* A named container (**piwik**)
+* A predefined password for the MySQL **admin** user
+* Two data volumes (which will survive a restart or recreation of the container). The MySQL data is available in **/data/mysql** on the host. The PHP application files are available in **/app** on the host
 
+As follows: 
 
-If you haven't defined a password, the container will generate a random
-one.  
-Check the logs for the randomly generated MySQL password by running: 
+```no-highlight
+sudo docker run -d \
+    -p 80:80 \
+    -p 443:443 \
+    -p 3306:3306 \
+    -v /app:/var/www/html \
+    -v /data/mysql:/var/lib/mysql \
+    -e MYSQL_PASS="password"  \
+    --name piwik \
+    dell/piwik
+```
+
+### 2. Check the Log Files
+
+If you haven't defined a MySQL password, the container will generate a random one. Check the logs for the password by running: 
 
      sudo docker logs piwik
+
+You will see output like the following:
 
 ```no-highlight
 ========================================================================
 You can now connect to this MySQL Server using:
 
-    mysql -uadmin -p<password> -h<host> -P<port>
+    mysql -uadmin -pca1w7dUhnIgI -h<host> -P<port>
 
 Please remember to change the above password as soon as possible!
 MySQL user 'root' has no password but only allows local connections
 ========================================================================
 ```
 
+In this case, **ca1w7dUhnIgI** is the password allocated to the admin user. You will need these credentials when configuring Piwik for the first time. Test the admin connection to MySQL, as follows, substituting your password: 
 
-MySQL admin credentials will be needed when configuring Piwik the first time.
-
-Next, you can test the admin connection to MySQL:
-
-    mysql -uadmin -p<password> -h127.0.0.1 -P3306
+    mysql -uadmin -pca1w7dUhnIgI -h127.0.0.1 -P3306
 
 
-### 4. Configure Piwik
+### 3. Configure Piwik
 Access the container from your browser:
 
     http://<ip address>
     
-    OR
+OR
  
     https://<ip address>
 
-
 **We strongly recommend that you connect via HTTPS**, for this step, and all subsequent administrative tasks, if the container is running outside your local machine (e.g. in the Cloud). Your browser will warn you that the certificate is not trusted. If you are unclear about how to proceed, please consult your browser's documentation on how to accept the certificate.
 
-#### Step 1: Welcome to Piwik's Installation Wizard!
-Click Next to proceed with the installation.
-Click Next after System check.
-.
-#### Step 2: Set up the database
+#### Step 1: Welcome!
+Click **Next** to proceed with the installation.
+
+#### Step 2: System Check
+Click **Next**.
+
+#### Step 3: Database Setup
 Complete the required information:
 
 * Database Server : **127.0.0.1**
 * Login: **admin**
-* Password: **admin_password**. *The MySQL admin password read from the logs*
-* Database Name : **Enter a database name**. *This database will store Piwik information*
-* Tables Prefix: **_piwik**
+* Password: *The password read from the logs OR your predefined password*
+* Database Name : **piwik**
+* Tables Prefix: **piwik_**
 * Adapter: **MYSQL/PDO** 
 
-Click Next, Make sure tables were created successfully and click Next again.
+Click **Next**.
 
-#### Step 3: Set up the Piwik super user
+#### Step 4: Creating the Tables
+Verify that the tables were created successfully. Click **Next**.
 
-The super user is the user that you create when you install Piwik. 
-This user has the highest permissions. Choose your username and password:
+#### Step 5: Super User
+The super user is the user that you create when you install Piwik. This user has the highest permissions, and can perform administrative tasks such as adding new websites to monitor, adding users, changing user permissions, and enabling and disabling plugins.
 
-Do not lose this information; it is the only way for you to log in to Piwik for the first time. There is only one super user in each Piwik installation. The super user can perform administrative tasks such as adding new websites to monitor, adding users, changing user permissions, and enabling and disabling plugins.
+Choose your username and password. Do not lose this information; it is the only way for you to log in to Piwik for the first time.
 
-By default the super user will be signed up for upgrade and security alerts, as well as for community updates. Uncheck these boxes if you do not want to receive these emails.
+By default, the super user will be signed up for upgrade and security alerts, as well as for community updates. Uncheck these boxes if you do not want to receive these emails.
 
-Fill in the information and click Next.
+Fill in the information and click **Next**.
 
-#### Step 4: Set up Your First Website
+#### Step 6: Setup a Website
+Enter or select the values for the web site you want to track:
 
-Enter the name and URL of the first website you want to track. 
-You can add more websites once the installation is complete.
+* website name
+* website URL
+* website time zone
+* Ecommerce
 
-Piwik will issue you with a JavaScript tag. This code must appear on every page that you want Piwik to analyze. We recommend that you put this code just before your tag at the bottom of your pages (or in a general footer file that is included at the bottom of all your pages).
+Note that you can add more websites once the installation is complete.
 
-When you have copied your tracking tag click Next.
+Click **Next**.
 
-#### Step 5: Congratulation, Piwik is installed!
+### Step 7: JavaScript Tracking Code
 
-Piwik is installed and ready to track your visitors. 
-You are redirected to the login page. Login in with the Piwik super user credentials. 
+Piwik will issue you with a JavaScript tag, such as the following:
+
+```no-highlight
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//54.75.168.125/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 1]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//54.75.168.125/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+```
+
+This code must appear on every page that you want Piwik to analyze. We recommend that you put this code just before your tag at the bottom of your pages (or in a general footer file that is included at the bottom of all your pages).
+
+When you have copied your tracking tag click **Next**.
+
+#### Step 8: Congratulations
+
+Piwik is installed and ready to track your visitors. You are redirected to the login page. Login in with the Piwik super user credentials. 
 
 As soon as visitors start arriving, Piwik will be keeping track of their data. Piwik reports are generated in real time, so you should see data in your Piwik dashboard straight away.
+
+Click on **Continue to Piwik**.
 
 ## Reference
 

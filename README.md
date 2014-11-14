@@ -131,7 +131,7 @@ Note that you can add more websites once the installation is complete.
 
 Click **Next**.
 
-### Step 7: JavaScript Tracking Code
+#### Step 7: JavaScript Tracking Code
 
 Piwik will issue you with a JavaScript tag, such as the following:
 

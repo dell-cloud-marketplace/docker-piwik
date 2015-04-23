@@ -1,5 +1,6 @@
 #!/bin/bash
 
+APPLICATION_HOME="/var/www/html"
 VOLUME_HOME="/var/lib/mysql"
 
 # Possibly invoke the inherited script.
@@ -13,16 +14,15 @@ else
     echo "=> Using an existing volume of MySQL"
 fi
 
-APPLICATION_HOME="/var/www/html"
-
 # If the application directory is empty, copy the site.
 if [ ! "$(ls -A $APPLICATION_HOME)" ]; then
     # Copy the application folder.
     cp -r /piwik/. $APPLICATION_HOME
-
+    
     # Configure ownership.
-    chown -R www-data:www-data $APPLICATION_HOME/tmp
+    mkdir $APPLICATION_HOME/tmp
     chown -R www-data:www-data $APPLICATION_HOME/config
+    chown -R www-data:www-data $APPLICATION_HOME/tmp
 fi
 
 exec supervisord -n

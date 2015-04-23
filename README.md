@@ -8,7 +8,7 @@ The stack comprises the following components (some are obtained through [docker-
 
 Name       | Version                   | Description
 -----------|---------------------------|------------------------------
-Piwik      | 2.8.3                     | Web analytics platform
+Piwik      | 2.12.1                    | Web analytics platform
 Ubuntu     | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base) | Operating system
 MySQL      | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base) | Database
 Apache     | see [docker-lamp-base](https://github.com/dell-cloud-marketplace/docker-lamp-base) | Web server

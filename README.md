@@ -169,6 +169,12 @@ Click on **Continue to Piwik**.
 
 ## Reference
 
+### Environmental Variables
+
+Variable   | Default  | Description
+-----------|----------|----------------------------------
+MYSQL_PASS | *random* | Password for MySQL user **admin**
+
 ### Image Details
 
 Inspired by [bprodoehl/piwik](https://github.com/bprodoehl/docker-piwik-mariadb)
